@@ -1,0 +1,41 @@
+name: Test additional inputs coverage
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Run proof-html with additional inputs
+        id: action
+        uses: .
+        with:
+          directory: ${{ github.workspace }}/tests/fixtures/valid-site
+          check_html: "false"
+          check_css: "false"
+          check_favicon: "false"
+          check_opengraph: "false"
+          check_external_hash: "false"
+          enforce_https: "false"
+          disable_external: "true"
+          allow_missing_href: "true"
+          ignore_empty_alt: "true"
+          ignore_missing_alt: "true"
+          validator_ignore: "some-pattern-that-wont-match"
+          ignore_url_re: "https://example\\.com/nonexistent"
+          swap_urls: "{}"
+          tokens: "{}"
+          max_concurrency: "10"
+          connect_timeout: "30"
+          timeout: "30"
+          retries: "3"
+      - name: Assert action succeeded with additional inputs
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          if [ "$OUTCOME" != "success" ]; then
+            echo "FAIL: expected action to succeed with additional inputs, but got outcome '$OUTCOME'"
+            exit 1
+          fi
+          echo "PASS: action succeeded with all additional inputs"

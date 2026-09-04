@@ -1,0 +1,30 @@
+name: Test ignore_url option
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Run proof-html with ignore_url set
+        id: action
+        uses: .
+        with:
+          directory: ${{ github.workspace }}/tests/fixtures/ignore-url-site
+          check_html: "false"
+          check_favicon: "false"
+          check_opengraph: "false"
+          enforce_https: "false"
+          disable_external: "true"
+          ignore_url: |
+            https://example.com/some-page
+      - name: Assert action succeeded with ignored URL
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          if [ "$OUTCOME" != "success" ]; then
+            echo "FAIL: expected action to succeed when URL is ignored, but got outcome '$OUTCOME'"
+            exit 1
+          fi
+          echo "PASS: action succeeded with ignored URL"
